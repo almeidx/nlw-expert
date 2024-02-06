@@ -3,7 +3,5 @@
 		"editor.defaultFormatter": "biomejs.biome"
 	},
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"cSpell.words": [
-		"fastify"
-	]
+	"cSpell.words": ["fastify"]
 }
