@@ -1,6 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { type ChangeEvent, useState, FormEvent } from "react";
+import { type ChangeEvent, FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 export function NewNoteCard() {
