@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FastifyInstanceWithZod } from "../../lib/fastify.js";
+import type { FastifyInstanceWithZod } from "../../lib/fastify.js";
 import { prisma } from "../../lib/prisma.js";
 
 export async function createPoll(app: FastifyInstanceWithZod) {
@@ -23,7 +23,7 @@ export async function createPoll(app: FastifyInstanceWithZod) {
 						createMany: {
 							data: options.map((title) => ({ title })),
 						},
-					}
+					},
 				},
 				select: {
 					id: true,
@@ -32,7 +32,7 @@ export async function createPoll(app: FastifyInstanceWithZod) {
 
 			reply.statusCode = 201;
 
-			return { pollId: id }
+			return { pollId: id };
 		},
 	);
 }

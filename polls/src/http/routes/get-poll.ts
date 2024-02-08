@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { FastifyInstanceWithZod } from "../../lib/fastify.js";
+import type { FastifyInstanceWithZod } from "../../lib/fastify.js";
 import { prisma } from "../../lib/prisma.js";
+import { redis } from "../../lib/redis.js";
 
 export async function getPoll(app: FastifyInstanceWithZod) {
 	app.get(
@@ -9,7 +10,7 @@ export async function getPoll(app: FastifyInstanceWithZod) {
 			schema: {
 				params: z.object({
 					pollId: z.string().uuid(),
-				})
+				}),
 			},
 		},
 		async (request, reply) => {
@@ -25,7 +26,7 @@ export async function getPoll(app: FastifyInstanceWithZod) {
 							id: true,
 							title: true,
 						},
-					}
+					},
 				},
 			});
 
@@ -34,7 +35,23 @@ export async function getPoll(app: FastifyInstanceWithZod) {
 				return { error: "Poll not found" };
 			}
 
-			return poll;
+			const scores = await redis.zrange(pollId, 0, -1, "WITHSCORES");
+
+			const votes = scores.reduce((acc, value, index, results) => {
+				if (index % 2 === 0) {
+					const score = Number.parseInt(results[index + 1], 10);
+					acc.set(value, score);
+				}
+				return acc;
+			}, new Map<string, number>());
+
+			return {
+				...poll,
+				options: poll.options.map((option) => ({
+					...option,
+					score: votes.get(option.id) ?? 0,
+				})),
+			};
 		},
 	);
 }

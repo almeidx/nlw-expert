@@ -2,7 +2,7 @@
 	"name": "nlw-expert",
 	"private": true,
 	"scripts": {
-		"format": "pnpm -r run format"
+		"format": "pnpm -r format"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.5.3"

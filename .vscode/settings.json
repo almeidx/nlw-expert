@@ -5,7 +5,5 @@
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"cSpell.words": [
-		"devcontainers"
-	]
+	"cSpell.words": ["devcontainers", "WITHSCORES", "zincrby", "zrange"]
 }

@@ -1,6 +1,8 @@
 import { z } from "zod";
-import { FastifyInstanceWithZod } from "../../lib/fastify.js";
+import type { FastifyInstanceWithZod } from "../../lib/fastify.js";
 import { prisma } from "../../lib/prisma.js";
+import { redis } from "../../lib/redis.js";
+import { publishVotes } from "../../utils/voting-pubsub.js";
 
 export async function voteOnPoll(app: FastifyInstanceWithZod) {
 	app.post(
@@ -48,6 +50,10 @@ export async function voteOnPoll(app: FastifyInstanceWithZod) {
 							},
 						},
 					});
+
+					const votes = await redis.zincrby(pollId, -1, userPreviousVoteOnPoll.pollOptionId);
+
+					publishVotes(pollId, { pollOptionId: userPreviousVoteOnPoll.pollOptionId, votes: Number(votes) });
 				}
 			}
 
@@ -67,8 +73,12 @@ export async function voteOnPoll(app: FastifyInstanceWithZod) {
 					sessionId,
 					pollId,
 					pollOptionId,
-				}
+				},
 			});
+
+			const votes = await redis.zincrby(pollId, 1, pollOptionId);
+
+			publishVotes(pollId, { pollOptionId, votes: Number(votes) });
 
 			reply.statusCode = 201;
 
